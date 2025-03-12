@@ -82,6 +82,7 @@ public class SongOfMortalityPlugin extends Plugin
 		if (event.getKey().equals("deleteSave") && config.deleteSavedData())
 		{
 			killedSet.clear();
+			tempSet.clear();
 			SaveFileManager.DeleteData();
 		}
 	}
@@ -141,12 +142,9 @@ public class SongOfMortalityPlugin extends Plugin
 				TryDumpGodWarsMinions();
 			}
 		}
-		else // Add to killed set
+		else
 		{
-			if (killedSet.contains(npc.getId()) == false)
-			{
-				killedSet.add(npc.getId());
-			}
+			AddToKillSet(npc);
 		}
 	}
 
@@ -296,6 +294,27 @@ public class SongOfMortalityPlugin extends Plugin
 			}
 
 			tempSet.clear();
+		}
+	}
+
+	private void AddToKillSet(NPC npc)
+	{
+		int npcId = npc.getId();
+		if (killedSet.contains(npcId)) return;
+
+		int[] variants = DataFinder.TryGetNpcVariants(npcId);
+
+		if (variants == null)
+		{
+			killedSet.add(npc.getId());
+		}
+		else
+		{
+            for (int variant : variants)
+			{
+                if (killedSet.contains(variant)) continue;
+                killedSet.add(variant);
+            }
 		}
 	}
 }
