@@ -375,6 +375,71 @@ public class DataFinder
             case NpcID.MUGGER_1461:
             case NpcID.MUGGER_6996:
                 return new int[]{NpcID.MUGGER, NpcID.MUGGER_1461, NpcID.MUGGER_6996};
+
+            case NpcID.GIANT_BAT:
+            case NpcID.GIANT_BAT_6824:
+            case NpcID.GIANT_BAT_4504:
+            case NpcID.GIANT_BAT_4562:
+            case NpcID.GIANT_BAT_5791:
+                return new int[]{NpcID.GIANT_BAT, NpcID.GIANT_BAT_6824, NpcID.GIANT_BAT_4504, NpcID.GIANT_BAT_4562, NpcID.GIANT_BAT_5791};
+
+            case NpcID.BLACK_DEMON:
+            case NpcID.BLACK_DEMON_2048:
+            case NpcID.BLACK_DEMON_2049:
+            case NpcID.BLACK_DEMON_2050:
+            case NpcID.BLACK_DEMON_2051:
+            case NpcID.BLACK_DEMON_2052:
+            case NpcID.BLACK_DEMON_5874:
+            case NpcID.BLACK_DEMON_5875:
+            case NpcID.BLACK_DEMON_5876:
+            case NpcID.BLACK_DEMON_5877:
+            case NpcID.BLACK_DEMON_7243:
+            case NpcID.BLACK_DEMON_7242:
+            case NpcID.BLACK_DEMON_7874:
+            case NpcID.BLACK_DEMON_7875:
+            case NpcID.BLACK_DEMON_7876:
+                return new int[]{NpcID.BLACK_DEMON, NpcID.BLACK_DEMON_2048, NpcID.BLACK_DEMON_2049, NpcID.BLACK_DEMON_2050, NpcID.BLACK_DEMON_2051, NpcID.BLACK_DEMON_2052, NpcID.BLACK_DEMON_5874, NpcID.BLACK_DEMON_5875, NpcID.BLACK_DEMON_5876, NpcID.BLACK_DEMON_5877, NpcID.BLACK_DEMON_7243, NpcID.BLACK_DEMON_7242, NpcID.BLACK_DEMON_7874, NpcID.BLACK_DEMON_7875, NpcID.BLACK_DEMON_7876};
+
+//            case NpcID.ZOMBIE:
+//            case NpcID.ZOMBIE_27:
+//            case NpcID.ZOMBIE_28:
+//            case NpcID.ZOMBIE_29:
+//            case NpcID.ZOMBIE_30:
+//            case NpcID.ZOMBIE_31:
+//            case NpcID.ZOMBIE_32:
+//            case NpcID.ZOMBIE_34:
+//            case NpcID.ZOMBIE_37:
+//            case NpcID.ZOMBIE_38:
+//            case NpcID.ZOMBIE_39:
+//            case NpcID.ZOMBIE_40:
+//            case NpcID.ZOMBIE_41:
+//            case NpcID.ZOMBIE_42:
+//            case NpcID.ZOMBIE_43:
+//            case NpcID.ZOMBIE_44:
+//            case NpcID.ZOMBIE_49:
+//            case NpcID.ZOMBIE_50:
+//            case NpcID.ZOMBIE_51:
+//            case NpcID.ZOMBIE_52:
+//            case NpcID.ZOMBIE_54:
+//            case NpcID.ZOMBIE_55:
+//            case NpcID.ZOMBIE_56:
+//            case NpcID.ZOMBIE_57:
+//            case NpcID.ZOMBIE_58:
+//            case NpcID.ZOMBIE_64:
+//            case NpcID.ZOMBIE_65:
+//            case NpcID.ZOMBIE_66:
+//            case NpcID.ZOMBIE_67:
+//            case NpcID.ZOMBIE_68:
+//            case NpcID.ZOMBIE_7486:
+//            case NpcID.ZOMBIE_7485:
+//            case NpcID.ZOMBIE_7488:
+//            case NpcID.ZOMBIE_7487:
+//            case NpcID.ZOMBIE_3980:
+//            case NpcID.ZOMBIE_3981:
+//            case NpcID.ZOMBIE_6741:
+//            case NpcID.ZOMBIE_8067:
+//            case NpcID.ZOMBIE_8068:
+//            case NpcID.ZOMBIE_8069:
         }
         return null;
     }

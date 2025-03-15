@@ -16,11 +16,13 @@ import net.runelite.client.callback.ClientThread;
 import net.runelite.client.callback.Hooks;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.events.ClientShutdown;
 import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import org.apache.commons.lang3.ArrayUtils;
 
+import java.util.HashMap;
 import java.util.HashSet;
 
 @Slf4j
@@ -49,8 +51,8 @@ public class SongOfMortalityPlugin extends Plugin
 
 	private final Hooks.RenderableDrawListener drawListener = this::shouldDraw;
 
-	private HashSet<Integer> killedSet = new HashSet<>();
-	private HashSet<Integer> tempSet = new HashSet<>();
+	private HashSet<String> killedSet = new HashSet<>();
+	private HashMap<Integer, String> tempMap = new HashMap<>();
 	private boolean isInInstance = false;
 	private boolean wasInInstance = false;
 
@@ -82,13 +84,13 @@ public class SongOfMortalityPlugin extends Plugin
 		if (event.getKey().equals("deleteSave") && config.deleteSavedData())
 		{
 			killedSet.clear();
-			tempSet.clear();
+			tempMap.clear();
 			SaveFileManager.DeleteData();
 		}
 	}
 
 	@Override
-	protected void startUp() throws Exception
+	protected void startUp()
 	{
 		hooks.registerRenderableDrawListener(drawListener);
 		SaveFileManager.Init(gson, configManager);
@@ -96,24 +98,22 @@ public class SongOfMortalityPlugin extends Plugin
 	}
 
 	@Override
-	protected void shutDown() throws Exception
+	protected void shutDown()
 	{
 		hooks.unregisterRenderableDrawListener(drawListener);
 		SaveFileManager.Save(killedSet);
-		killedSet.clear();
-		clientThread.invoke(() ->
-		{
-			if (client.getGameState() == GameState.LOGGED_IN)
-			{
-				client.setGameState(GameState.LOADING);
-			}
-		});
+	}
+
+	@Subscribe(priority = 101)
+	protected void onClientShutdown(ClientShutdown e)
+	{
+		SaveFileManager.Save(killedSet);
 	}
 
 	@Subscribe
 	public void onGameStateChanged(GameStateChanged gameStateChanged)
 	{
-		if (gameStateChanged.getGameState() == GameState.LOGGED_IN)
+		if (gameStateChanged.getGameState() == GameState.LOGGED_IN && killedSet.isEmpty() == false)
 		{
 			SaveFileManager.Save(killedSet);
 		}
@@ -136,9 +136,9 @@ public class SongOfMortalityPlugin extends Plugin
 		// GWD exception
 		if (client.getWidget(ComponentID.GWD_KC_LAYER) != null)
 		{
-		 	if (tempSet.contains(npc.getId()) == false)
+		 	if (tempMap.containsKey(npc.getName()) == false)
 			{
-				tempSet.add(npc.getId());
+				tempMap.put(npc.getId(), npc.getName());
 				TryDumpGodWarsMinions();
 			}
 		}
@@ -154,7 +154,7 @@ public class SongOfMortalityPlugin extends Plugin
 		if (renderable instanceof NPC)
 		{
 			NPC actor = (NPC) renderable;
-            return !killedSet.contains(actor.getId());
+			return !(killedSet.contains(actor.getName()) && actor.getCombatLevel() > 0);
 		}
 		return true;
 	}
@@ -197,22 +197,13 @@ public class SongOfMortalityPlugin extends Plugin
 	private boolean ProcessInstanceKill(NPC npc)
 	{
 		isInInstance = false;
-		// Fight Caves
-		if (ArrayUtils.contains(client.getMapRegions(), 9551))
+		// Fight Caves and inferno
+		if (ArrayUtils.contains(client.getMapRegions(), 9551) || ArrayUtils.contains(client.getMapRegions(), 9043))
 		{
 			isInInstance = true;
-			if (tempSet.contains(npc.getId()) == false)
+			if (tempMap.containsKey(npc.getId()) == false)
 			{
-				tempSet.add(npc.getId());
-			}
-		}
-		// Inferno
-		else if (ArrayUtils.contains(client.getMapRegions(), 9043))
-		{
-			isInInstance = true;
-			if (tempSet.contains(npc.getId()) == false)
-			{
-				tempSet.add(npc.getId());
+				tempMap.put(npc.getId(), npc.getName());
 			}
 		}
 		return isInInstance;
@@ -222,8 +213,11 @@ public class SongOfMortalityPlugin extends Plugin
 	{
 		if (isInInstance != wasInInstance)
 		{
-			killedSet.addAll(tempSet);
-			tempSet.clear();
+			for (var ID : tempMap.keySet())
+			{
+				killedSet.add(tempMap.get(ID));
+			}
+			tempMap.clear();
 			return true;
 		}
 		return false;
@@ -233,88 +227,74 @@ public class SongOfMortalityPlugin extends Plugin
 	{
 		if (AtRequiredKC(God.Armadyl))
 		{
-			for (int ID : tempSet)
+			for (var ID : tempMap.keySet())
 			{
 				if (DataFinder.IsArmadylMinion(ID))
 				{
-					killedSet.add(ID);
+					killedSet.add(tempMap.get(ID));
 				}
 			}
 
-			tempSet.clear();
+			tempMap.clear();
 		}
 
 		if (AtRequiredKC(God.Bandos))
 		{
-			for (int ID : tempSet)
+			for (var ID : tempMap.keySet())
 			{
 				if (DataFinder.IsBandosMinion(ID))
 				{
-					killedSet.add(ID);
+					killedSet.add(tempMap.get(ID));
 				}
 			}
 
-			tempSet.clear();
+			tempMap.clear();
 		}
 
 		if (AtRequiredKC(God.Saradomin))
 		{
-			for (int ID : tempSet)
+			for (var ID : tempMap.keySet())
 			{
 				if (DataFinder.IsSaradominMinion(ID))
 				{
-					killedSet.add(ID);
+					killedSet.add(tempMap.get(ID));
 				}
 			}
 
-			tempSet.clear();
+			tempMap.clear();
 		}
 
 		if (AtRequiredKC(God.Zamorak))
 		{
-			for (int ID : tempSet)
+			for (var ID : tempMap.keySet())
 			{
 				if (DataFinder.IsZamorakMinion(ID))
 				{
-					killedSet.add(ID);
+					killedSet.add(tempMap.get(ID));
 				}
 			}
 
-			tempSet.clear();
+			tempMap.clear();
 		}
 
 		if (AtRequiredKC(God.Zaros))
 		{
-			for (int ID : tempSet)
+			for (var ID : tempMap.keySet())
 			{
 				if (DataFinder.IsZarosMinion(ID))
 				{
-					killedSet.add(ID);
+					killedSet.add(tempMap.get(ID));
 				}
 			}
 
-			tempSet.clear();
+			tempMap.clear();
 		}
 	}
 
 	private void AddToKillSet(NPC npc)
 	{
-		int npcId = npc.getId();
-		if (killedSet.contains(npcId)) return;
-
-		int[] variants = DataFinder.TryGetNpcVariants(npcId);
-
-		if (variants == null)
-		{
-			killedSet.add(npc.getId());
-		}
-		else
-		{
-            for (int variant : variants)
-			{
-                if (killedSet.contains(variant)) continue;
-                killedSet.add(variant);
-            }
-		}
+		String npcName = npc.getName();
+		if (killedSet.contains(npcName)) return;
+		killedSet.add(npcName);
 	}
 }
